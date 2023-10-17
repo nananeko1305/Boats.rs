@@ -1,13 +1,15 @@
 package data
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"gorm.io/gorm"
+)
 
 type DataLayer struct {
-	collection *mongo.Collection
+	dbClient *gorm.DB
 }
 
-func InitDataLayer(collection *mongo.Collection) *DataLayer {
+func InitDataLayer(dbClient *gorm.DB) *DataLayer {
 	return &DataLayer{
-		collection: collection,
+		dbClient: dbClient,
 	}
 }

@@ -1,24 +1,46 @@
 package connection
 
 import (
-	"context"
 	"fmt"
+	"log"
+	"os"
 	configuration "user_service/configuration/enviroment"
+	"user_service/models"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
-func initClient(enviroment *configuration.Enviroment) (*mongo.Client, error) {
-	uri := fmt.Sprintf("mongodb://%s:%s/", enviroment.USER_DB_HOST, enviroment.USER_DB_PORT)
-	optionsClient := options.Client().ApplyURI(uri)
-	return mongo.Connect(context.TODO(), optionsClient)
-}
+func ConnectToDatabase(enviroment *configuration.Enviroment) *gorm.DB {
 
-func ConnectToDatabase(enviroment *configuration.Enviroment) (*mongo.Collection, error) {
-	client, err := initClient(enviroment)
+	// Create connection string
+	uri := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", enviroment.DB_HOST, enviroment.DB_PORT, enviroment.DB_USER, enviroment.DB_PASS, enviroment.DB_NAME)
+
+	// Generating client for communication with Postgres
+	dbClient, err := gorm.Open(
+		postgres.Open(uri),
+		&gorm.Config{
+			DryRun:         false,
+			NamingStrategy: schema.NamingStrategy{SingularTable: false},
+			Logger:         logger.Default.LogMode(logger.Error),
+			TranslateError: true,
+		},
+	)
 	if err != nil {
-		return nil, err
+		log.Println("CONNECTION PROBLEM", err.Error())
+		os.Exit(2)
 	}
-	return client.Database(enviroment.DATABASE).Collection(enviroment.COLLECTION), nil
+
+	// Create tables on state of structure
+	if err = dbClient.AutoMigrate(
+		&models.Bike{},
+		&models.Brand{},
+		&models.Model{},
+	); err != nil {
+		panic(err.Error())
+	}
+
+	return dbClient
 }
