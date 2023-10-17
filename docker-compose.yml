@@ -12,23 +12,28 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - user_db
+      - bike_db
     networks:
       - network
 
-  user_db:
-    image: mongo
-    container_name: user_db
+  bike_db:
+    image: postgres:latest
+    container_name: bike_db
+    ports:
+      - "5432:5432"
     restart: on-failure
+    environment:
+      - DATABASE_HOST=bike_db
+      - POSTGRES_DB=bikes
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     networks:
       - network
-    volumes:
-      - /home/nananeko1305/Desktop/mongoDB:/data/db
-
+    # volumes:
+    #   - /home/nananeko1305/Desktop/postgres:/data/rostgres
 
 networks:
   network:
     driver: bridge
-
-volumes:
-  user_db:
+# volumes:
+#   user_db:

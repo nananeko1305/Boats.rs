@@ -26,11 +26,8 @@ func Start(enviroment *configuration.Enviroment) {
 
 func initLayers(engine *gin.Engine, enviroment *configuration.Enviroment) {
 
-	// Get Colection from MongoDB
-	collection, err := connection.ConnectToDatabase(enviroment)
-	if err != nil {
-		panic(err)
-	}
+	// Init Connection to Postgres
+	collection := connection.ConnectToDatabase(enviroment)
 
 	// Define logger
 	logger := zap.Logger{}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	configuration "user_service/configuration/enviroment"
 	"user_service/configuration/server"
 
@@ -10,5 +11,6 @@ import (
 func main() {
 	godotenv.Load()
 	enviroment := configuration.NewEnviroment()
+	log.Println(enviroment)
 	server.Start(enviroment)
 }

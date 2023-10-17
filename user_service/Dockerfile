@@ -3,7 +3,7 @@ WORKDIR /app
 COPY ./user_service/go.mod ./user_service/go.sum ./
 RUN go mod download -x
 COPY ./user_service ./
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd
 
 FROM alpine:latest
 WORKDIR /root
